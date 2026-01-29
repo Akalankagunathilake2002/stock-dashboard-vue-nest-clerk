@@ -6,7 +6,7 @@ import TopNav from "./components/TopNav.vue";
 import StatCard from "./components/StatCard.vue";
 import QuotePanel from "./components/QuotePanel.vue";
 
-/* ✅ ENV values MUST be read inside script */
+
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL as string;
 const clerkPublishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as string;
 
@@ -59,7 +59,7 @@ onMounted(async () => {
         <div>
           <h1 class="text-2xl font-semibold">Welcome to the real-time Stocks Dashbaord </h1>
           <p class="text-sm text-white/60">
-            Tech Stacks :  Vue + NestJS + Clerk + Twelve Data
+            Tech Stacks :  Vue + NestJS + Clerk + Twelve Data for the Stock market
           </p>
         </div>
 
