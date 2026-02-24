@@ -21,6 +21,26 @@ export class ClerkAuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
 
+    /**
+     * ✅ TEST BYPASS (for Cypress / automation demo)
+     * Option 1: run backend with NODE_ENV=test
+     * Option 2: send header x-e2e-test: true from Cypress
+     */
+    const nodeEnv = process.env.NODE_ENV;
+    const e2eHeader = req.headers["x-e2e-test"];
+    const isE2E =
+      nodeEnv === "test" ||
+      e2eHeader === "true" ||
+      e2eHeader === true ||
+      (Array.isArray(e2eHeader) && e2eHeader.includes("true"));
+
+    if (isE2E) {
+      // Attach a fake auth object so your controller/service can still read req.auth if needed
+      req.auth = { userId: "e2e-test-user", sessionId: "e2e-session" };
+      return true;
+    }
+
+    // ✅ Normal (real) auth flow
     const authHeader = req.headers.authorization;
     if (!authHeader?.startsWith("Bearer ")) {
       throw new UnauthorizedException("Missing Bearer token");
@@ -42,8 +62,9 @@ export class ClerkAuthGuard implements CanActivate {
 
     try {
       const result = await this.clerk.authenticateRequest(webRequest, {
-        // allow your frontend origin
-        authorizedParties: [this.config.get("FRONTEND_ORIGIN") || "http://localhost:5173"],
+        authorizedParties: [
+          this.config.get("FRONTEND_ORIGIN") || "http://localhost:5173",
+        ],
       });
 
       if (!result.isAuthenticated) {
